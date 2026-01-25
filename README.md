@@ -160,8 +160,6 @@ Backend Developer (Node.js | MySQL | Docker )
 
 This README is designed to be:
 
-* Interview‑ready
-* Beginner‑friendly
 * Easy to extend as the system grows
 
 Kafka & advanced system‑design notes will be added later.
