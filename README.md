@@ -99,6 +99,7 @@ flowchart LR
 * Containers **communicate using container names**, not `localhost`
 * MySQL **always runs on port 3306 inside Docker**
 * Host port (e.g. 3307) is only for local machine access
+* Data is persistent using Docker volumes
 
 ---
 
@@ -109,6 +110,16 @@ flowchart LR
 * Credentials: **stored via environment variables (recommended)**
 
 > Sensitive data like passwords and secrets are intentionally excluded.
+
+---
+
+## 🧱 Database Strategy
+
+✔ Tables are not auto-created
+✔ Tables created using migration SQL
+✔ Data persists using Docker volumes
+✔ Tables are NOT recreated on container restart
+✔ Only recreated if volume is deleted
 
 ---
 
@@ -142,7 +153,6 @@ curl http://localhost:3000/api/orders
 ## 🔮 Future Enhancements
 
 * Kafka integration (event‑driven order processing)
-* Docker Compose setup
 * Authentication (JWT)
 * Order status events (CREATED, CONFIRMED, CANCELLED)
 * Logging & monitoring
@@ -152,7 +162,7 @@ curl http://localhost:3000/api/orders
 ## 👨‍💻 Author
 
 **Abhishek Singh**
-Backend Developer (Node.js | MySQL | Docker )
+Backend Developer (Node.js | MySQL | Docker  )
 
 ---
 
