@@ -1,6 +1,7 @@
 /**Controllers assume tables exist */
 
 const Order = require("../models/orders.model.js");
+const { sendOrderEvent } = require("../kafka/producer.js");
 
 const createOrder = async (req, res) => {
   try {
@@ -12,13 +13,24 @@ const createOrder = async (req, res) => {
       });
     }
 
-    const [result] = await Order.createOrder(product_id, quantity);
+    const [result] = await Order.createOrder(product_id, quantity); 
+
+    const orderData = {
+      order_id: result.insertId,
+      product_id,
+      quantity,
+      status: "CREATED",
+      createdAt: new Date(),
+    };
+
+    await sendOrderEvent(orderData); // for my reference im sending an event to Kafka here
 
     return res.status(201).json({
       message: "Order created successfully",
       order_id: result.insertId,
       status: "CREATED",
     });
+
   } catch (error) {
     console.error("Create Order Error:", error);
     return res.status(500).json({
@@ -95,6 +107,10 @@ const updateOrderById = async (req, res) => {
       });
     }
 
+    if (status === "PAID") {
+    sendOrderEvent({ type: `${status}`, orderId: id });
+    }
+
     return res.status(200).json({
       message: `Order ${id} updated successfully`,
     });
@@ -124,9 +140,16 @@ const deleteOrderById = async (req, res) => {
       });
     }
 
+      await sendOrderEvent({
+      type: "ORDER_CANCELLED",
+      orderId: id,
+      timestamp: new Date().toISOString(),
+    });
+
     return res.status(200).json({
       message: `Order ${id} deleted successfully`,
     });
+
   } catch (error) {
     console.error("Delete Order Error:", error);
     return res.status(500).json({

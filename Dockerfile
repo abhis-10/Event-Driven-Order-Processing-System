@@ -1,5 +1,5 @@
 # 1. Use Node.js as base
-FROM node:18
+FROM node:18-bullseye
 
 # 2. Set working directory inside container
 WORKDIR /app

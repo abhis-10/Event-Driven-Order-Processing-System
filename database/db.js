@@ -1,15 +1,14 @@
 const mysql = require("mysql2");
 
 const connection = mysql.createConnection({
-    host:"mysql",  // Use service name from docker-compose.yml, not container name
+    host:"mysql",
     user:"root",
-    password:"",     /*use .env file for storing credentials like passwords and db names. */
+    password:"",
     database:"order_service_db",
     port:3306,
     waitForConnections: true
 })
 
-// Retry connection logic
 const connectWithRetry = (retries = 5, delay = 5000) => {
   connection.connect((err) => {
     if (err) {
