@@ -101,19 +101,19 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    Browser -->|3000| NodeContainer[Node.js Container]
-
-    NodeContainer -->|3306| MySQLContainer[MySQL Container]
-
-    NodeContainer -->|9092| KafkaContainer[Kafka Broker]
-
-    KafkaContainer -->|2181| ZookeeperContainer[Zookeeper]
+    Browser["Client / Postman"]
 
     subgraph Docker_Network
-        NodeContainer
-        MySQLContainer
-        KafkaContainer
-        ZookeeperContainer
+        Node["Node.js Order Service"]
+        MySQL["MySQL Database"]
+        Kafka["Kafka Broker"]
+        Zookeeper["Zookeeper"]
+    end
+
+    Browser -->|HTTP :3000| Node
+    Node -->|DB :3306| MySQL
+    Node -->|Produce / Consume :9092| Kafka
+    Kafka -->|Metadata :2181| Zookeeper
 ```
 ### NOTE : Node.js runs as a producer and consumer inside Docker, publishing events to Kafka, consuming them asynchronously, and persisting final state in MySQL.
 
