@@ -1,10 +1,10 @@
-# 📦 Order Service (Node.js + MySQL + Docker)
+# Order Service (Node.js + MySQL + Docker)
 
 A backend **Order Service** built using **Node.js**, **Express**, and **MySQL**, designed with a clean MVC structure and containerized using **Docker**. This project is part of an **event‑driven system roadmap** (Kafka planned next).
 
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 
 * **Node.js**
 * **Express.js**
