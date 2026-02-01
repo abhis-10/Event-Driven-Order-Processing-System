@@ -211,7 +211,7 @@ flowchart LR
 ## Author
 
 **Abhishek Singh**
-Backend Developer (Node.js | MySQL | Docker  )
+Backend Developer (Node.js | MySQL | Docker | Kafka )
 
 ---
 
