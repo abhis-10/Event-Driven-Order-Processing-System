@@ -20,22 +20,30 @@ A backend **Order Service** built using **Node.js**, **Express**, and **MySQL**,
 
 ```
 order-service/
-│
-├── src/
-│   ├── controllers/
-│   │   └── order.controller.js
-│   ├── routes/
-│   │   └── order.routes.js
-│   ├── models/
-│   │   └── order.model.js
-│   ├── db/
-│   │   └── mysql.js
-│   └── app.js
-│
-├── Dockerfile
+├── .dockerignore
+├── .env(excluded)
+├── .gitignore
+├── app.js                 # Main application entry point
 ├── package.json
 ├── package-lock.json
-└── README.md
+├── README.md
+├── Dockerfile
+├── docker-compose.yml
+│
+├── controller/
+│   └── orders.controller.js    # Order request handlers
+│
+├── database/
+│   └── db.js                   # Database connection
+│
+├── migration/
+│   └── 001_create_orders.sql   # DB schema migration
+│
+├── models/
+│   └── orders.model.js         # Order data model
+│
+└── routes/
+    └── order.routes.js         # Order API routes
 ```
 
 ---
