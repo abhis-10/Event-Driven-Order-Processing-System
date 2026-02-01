@@ -10,6 +10,7 @@ A backend **Order Service** built using **Node.js**, **Express**, and **MySQL**,
 * **Express.js**
 * **MySQL 8**
 * **Docker & Docker Desktop**
+* **Kafka**
 * **MVC Architecture**
 * **REST APIs**
 
