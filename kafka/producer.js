@@ -2,7 +2,7 @@ const { Kafka } = require("kafkajs");
 
 const kafka = new Kafka({
   clientId: "order-service",
-  brokers: ["localhost:9092"]
+  brokers: ["kafka:9092"]
 });
 
 const producer = kafka.producer();
@@ -13,7 +13,7 @@ const connectProducer = async () => {
 };
 
 const sendOrderEvent = async (orderData) => {
-  await producer.send({
+  const result = await producer.send({
     topic: "order-created",
     messages: [
       {
@@ -21,6 +21,7 @@ const sendOrderEvent = async (orderData) => {
       },
     ],
   });
+  console.log("Order event sent to Kafka:", orderData.order_id || orderData.orderId, result);
 };
 
 module.exports = {

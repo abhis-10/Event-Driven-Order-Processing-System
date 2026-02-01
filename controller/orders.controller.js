@@ -1,7 +1,7 @@
 /**Controllers assume tables exist */
 
 const Order = require("../models/orders.model.js");
-const { sendOrderEvent } = require("../kafka/Producer.js");
+const { sendOrderEvent } = require("../kafka/producer.js");
 
 const createOrder = async (req, res) => {
   try {
@@ -23,7 +23,7 @@ const createOrder = async (req, res) => {
       createdAt: new Date(),
     };
 
-    await sendOrderEvent(orderData); // im sending an event to Kafka here
+    await sendOrderEvent(orderData); // for my reference im sending an event to Kafka here
 
     return res.status(201).json({
       message: "Order created successfully",
