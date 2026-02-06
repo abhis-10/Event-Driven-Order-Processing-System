@@ -13,6 +13,7 @@ A backend **Order Service** built using **Node.js**, **Express**, and **MySQL**,
 * **Kafka**
 * **MVC Architecture**
 * **REST APIs**
+* **JWT**
 
 ---
 
@@ -211,7 +212,6 @@ flowchart LR
 
 ## Future Enhancements
 
-* Authentication (JWT)
 * Order status events (CREATED, CONFIRMED, CANCELLED)
 * Logging & monitoring
 
