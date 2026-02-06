@@ -5,9 +5,11 @@ const orderRoutes = require('./routes/order.routes');
 const { connectProducer } = require("./kafka/producer.js");
 
 const startConsumer=require("./kafka/consumer.js");
+const authRoutes = require("./routes/auth.routes.js");
 
 app.use(express.json());
-app.use('/api',orderRoutes)
+app.use("/api/auth", authRoutes);
+app.use('/api', orderRoutes)
 
   const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -17,10 +19,22 @@ app.use('/api',orderRoutes)
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
+      console.log("[Startup] Connecting producer...");
       await connectProducer();
-      await startConsumer();
       app.listen(3000, () => {
         console.log("Server is listening on port 3000");
+        // Set ENABLE_KAFKA_CONSUMER=0 to skip consumer (avoids JoinGroup timeouts; producer still works)
+        const enableConsumer = process.env.ENABLE_KAFKA_CONSUMER !== "0" && process.env.ENABLE_KAFKA_CONSUMER !== "false";
+        if (!enableConsumer) {
+          console.log("[Startup] Kafka consumer disabled (ENABLE_KAFKA_CONSUMER=0). Producer only.");
+          return;
+        }
+        setTimeout(() => {
+          console.log("[Startup] Starting consumer...");
+          startConsumer().catch((err) =>
+            console.error("[Startup] Consumer failed to start:", err.message)
+          );
+        }, 15000);
       });
       return;
     } catch (err) {
