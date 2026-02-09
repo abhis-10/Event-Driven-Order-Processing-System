@@ -19,32 +19,35 @@ A backend **Order Service** built using **Node.js**, **Express**, and **MySQL**,
 
 ## Project Structure
 
-```
-order-service/
-├── .dockerignore
-├── .env(excluded)
-├── .gitignore
-├── app.js                 # Main application entry point
-├── package.json
-├── package-lock.json
-├── README.md
-├── Dockerfile
-├── docker-compose.yml
-│
-├── controller/
-│   └── orders.controller.js    # Order request handlers
-│
-├── database/
-│   └── db.js                   # Database connection
-│
-├── migration/
-│   └── 001_create_orders.sql   # DB schema migration
-│
-├── models/
-│   └── orders.model.js         # Order data model
-│
-└── routes/
-    └── order.routes.js         # Order API routes
+```mermaid
+flowchart TD
+    A[order-service/] --> B(.dockerignore)
+    A --> C(.env)
+    A --> D(.gitignore)
+    A --> E(app.js)
+    A --> F(package.json)
+    A --> G(package-lock.json)
+    A --> H(README.md)
+    A --> I(Dockerfile)
+    A --> J(docker-compose.yml)
+    
+    A --> K(controller/)
+    K --> K1(orders.controller.js)
+    
+    A --> L(database/)
+    L --> L1(db.js)
+    
+    A --> M(migration/)
+    M --> M1(001_create_orders.sql)
+    
+    A --> N(models/)
+    N --> N1(orders.model.js)
+    
+    A --> O(routes/)
+    O --> O1(order.routes.js)
+
+    A --> P(middleware/)
+    P --> P1(auth.middleware.js)
 ```
 
 ---
@@ -53,7 +56,7 @@ order-service/
 
 ```mermaid
 flowchart LR
-    Client -->|HTTP Request| Express
+    Client -->|HTTP Request| middleware --> Express
     Express --> Routes
     Routes --> Controller
 
