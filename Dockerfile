@@ -1,5 +1,5 @@
-# 1. Use Node.js as base
-FROM node:18-bullseye
+# 1. Use Node.js as base (node:18 = official default; use if node:18-bullseye fails to pull)
+FROM node:18
 
 # 2. Set working directory inside container
 WORKDIR /app

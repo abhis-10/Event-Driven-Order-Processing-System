@@ -1,61 +1,79 @@
-# 📦 Order Service (Node.js + MySQL + Docker)
+# Order Service (Node.js + MySQL + Docker)
 
 A backend **Order Service** built using **Node.js**, **Express**, and **MySQL**, designed with a clean MVC structure and containerized using **Docker**. This project is part of an **event‑driven system roadmap** (Kafka planned next).
 
 ---
 
-## 🚀 Tech Stack
+## Tech Stack
 
 * **Node.js**
 * **Express.js**
 * **MySQL 8**
 * **Docker & Docker Desktop**
+* **Kafka**
 * **MVC Architecture**
 * **REST APIs**
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 order-service/
-│
-├── src/
-│   ├── controllers/
-│   │   └── order.controller.js
-│   ├── routes/
-│   │   └── order.routes.js
-│   ├── models/
-│   │   └── order.model.js
-│   ├── db/
-│   │   └── mysql.js
-│   └── app.js
-│
-├── Dockerfile
+├── .dockerignore
+├── .env(excluded)
+├── .gitignore
+├── app.js                 # Main application entry point
 ├── package.json
 ├── package-lock.json
-└── README.md
+├── README.md
+├── Dockerfile
+├── docker-compose.yml
+│
+├── controller/
+│   └── orders.controller.js    # Order request handlers
+│
+├── database/
+│   └── db.js                   # Database connection
+│
+├── migration/
+│   └── 001_create_orders.sql   # DB schema migration
+│
+├── models/
+│   └── orders.model.js         # Order data model
+│
+└── routes/
+    └── order.routes.js         # Order API routes
 ```
 
 ---
 
-## 🔁 API Flow (High Level)
+## API Flow (High Level)
 
 ```mermaid
 flowchart LR
     Client -->|HTTP Request| Express
     Express --> Routes
     Routes --> Controller
-    Controller --> Model
+
+    Controller -->|Send Event| KafkaProducer[(Kafka Producer)]
+    KafkaProducer --> KafkaTopic[(Kafka Topic)]
+
+    KafkaTopic --> KafkaConsumer[(Kafka Consumer)]
+    KafkaConsumer --> Model
     Model --> MySQL[(MySQL DB)]
+
     MySQL --> Model
-    Model --> Controller
-    Controller --> Client
+    Model --> KafkaConsumer
+    KafkaConsumer -->|Log / Process| Console[(Logs)]
+
+    Controller -->|Immediate Response| Client
+
 ```
 
 ---
 
-## 🔗 REST API Endpoints
+## REST API Endpoints
 
 | Method | Endpoint          | Description        |
 | ------ | ----------------- | ------------------ |
@@ -69,30 +87,44 @@ flowchart LR
 
 ---
 
-## 🧠 Controller Flow (Example: Get Order by ID)
+## Controller Flow (Example: Get Order by ID)
 
 ```mermaid
 flowchart TD
-    A[Client Request /api/orders/:id] --> B[Route Layer]
+    A[Client Request /api/orders/:id]
+    --> B[Express Route Layer]
+
     B --> C[Controller: getOrderById]
-    C --> D[Model: DB Query]
+
+    C --> D[Model: Fetch Order from DB]
+
     D --> E{Order Exists?}
-    E -- Yes --> F[Return Order]
+
+    E -- Yes --> F[Return 200 OK + Order Data]
     E -- No --> G[Return 404 Not Found]
 ```
 
 ---
 
-## 🐳 Docker Architecture
+## Docker Architecture
 
 ```mermaid
 flowchart LR
-    NodeContainer[Node.js Container]
-    MySQLContainer[MySQL Container]
+    Browser["Client / Postman"]
 
-    NodeContainer -->|3306| MySQLContainer
-    Browser -->|3000| NodeContainer
+    subgraph Docker_Network
+        Node["Node.js Order Service"]
+        MySQL["MySQL Database"]
+        Kafka["Kafka Broker"]
+        Zookeeper["Zookeeper"]
+    end
+
+    Browser -->|HTTP :3000| Node
+    Node -->|DB :3306| MySQL
+    Node -->|Produce / Consume :9092| Kafka
+    Kafka -->|Metadata :2181| Zookeeper
 ```
+### NOTE : Node.js runs as a producer and consumer inside Docker, publishing events to Kafka, consuming them asynchronously, and persisting final state in MySQL.
 
 ### Important Docker Rules
 
@@ -103,7 +135,7 @@ flowchart LR
 
 ---
 
-## 🐬 MySQL Connection (Sanitized)
+## MySQL Connection (Sanitized)
 
 * Host: `mysql` (container name)
 * Port: `3306`
@@ -113,7 +145,7 @@ flowchart LR
 
 ---
 
-## 🧱 Database Strategy
+## Database Strategy
 
 ✔ Tables are not auto-created
 ✔ Tables created using migration SQL
@@ -123,13 +155,14 @@ flowchart LR
 
 ---
 
-## ▶️ Running the Project (Docker)
+## Running the Project (Docker)
 
 1. Start Docker Desktop
 2. Build Node image
 3. Run MySQL container
 4. Run Node container
-5. Test APIs using browser or curl
+5. Run kafka container
+6. Test APIs using browser or curl
 
 Example:
 
@@ -139,9 +172,35 @@ curl http://localhost:3000/api/orders
 
 ---
 
-## ❗ Common Issues & Fixes
+### Kafka Integration 
 
-### ❌ DB Connection Error
+Kafka is used to:
+* Decouple order creation from database persistence
+* Enable asynchronous processing
+* Improve scalability and fault tolerance
+* Prepare the system for future microservices
+
+```mermaid
+flowchart LR
+    Client[Client / Postman] -->|HTTP Request| API[Node.js Express API]
+
+    API -->|Publish Event| Producer[Kafka Producer]
+    Producer --> Topic[Kafka Topic: order-created]
+
+    Topic --> Consumer[Kafka Consumer]
+    Consumer --> DB[(MySQL Database)]
+
+    API -->|Immediate Response| Client
+```
+* Client gets instant response
+* Order creation is event-driven
+* Kafka sits between API and DB
+* Consumer handles DB persistence asynchronously
+  
+
+## Common Issues & Fixes
+
+### DB Connection Error
 
 * Ensure MySQL container is running
 * Ensure database exists
@@ -150,26 +209,25 @@ curl http://localhost:3000/api/orders
 
 ---
 
-## 🔮 Future Enhancements
+## Future Enhancements
 
-* Kafka integration (event‑driven order processing)
 * Authentication (JWT)
 * Order status events (CREATED, CONFIRMED, CANCELLED)
 * Logging & monitoring
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **Abhishek Singh**
-Backend Developer (Node.js | MySQL | Docker  )
+Backend Developer (Node.js | MySQL | Docker | Kafka )
 
 ---
 
-## ⭐ Notes
+## Notes
 
 This README is designed to be:
 
 * Easy to extend as the system grows
 
-Kafka & advanced system‑design notes will be added later.
+Other microservices and advanced system‑design notes will be added later.

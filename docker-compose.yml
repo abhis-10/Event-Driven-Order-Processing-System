@@ -60,6 +60,10 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      # Allow longer consumer session so broker doesn't close connection during rebalances/slow heartbeats
+      KAFKA_GROUP_MAX_SESSION_TIMEOUT_MS: 300000
+      # Shorter delay so coordinator completes rebalance quickly (fewer JoinGroup timeouts)
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 500
     healthcheck:
       test: ["CMD-SHELL", "kafka-broker-api-versions --bootstrap-server localhost:9092 || exit 1"]
       interval: 5s
